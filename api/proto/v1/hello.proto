@@ -1,0 +1,30 @@
+// protoc \
+//  --proto_path=api/proto \
+//  --go_out=api/pb \
+//  --go_opt=paths=source_relative \
+//  --go-grpc_out=api/pb \
+//  --go-grpc_opt=paths=source_relative \
+//  api/proto/v1/hello.proto/v1/hello.proto
+
+// Specify the protobuf syntax version
+syntax = "proto3";
+
+// Declare the package name for the generated Go code
+package pb;
+
+// Set the Go package path for generated files, including an import alias
+option go_package = "simpleBE/api/pb/v1;v1";
+
+// Define the gRPC service with one RPC method
+service HelloService {
+  // RPC method that accepts a HelloRequest and returns a HelloReply
+  rpc GetHello(HelloRequest) returns (HelloReply);
+}
+
+// Define the request message (empty in this case)
+message HelloRequest {}
+
+// Define the response message containing a single string field
+message HelloReply {
+  string message = 1; // Field 1: the message content
+}

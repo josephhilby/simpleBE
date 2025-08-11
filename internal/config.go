@@ -4,6 +4,7 @@ package internal
 
 import (
 	"log"
+	"os"
 	"time"
 
 	"gorm.io/driver/postgres"
@@ -11,8 +12,15 @@ import (
 )
 
 func InitDB() *gorm.DB {
-	// Define the PostgreSQL DSN using service name 'db' for Docker Compose networking
-	dsn := "host=db port=5432 user=postgres password=postgres dbname=postgres sslmode=disable"
+	// Define the PostgreSQL DSN using service name 'db_dev' for Docker Compose networking
+	dsn := os.Getenv("DATABASE_URL")
+	if dsn == "" {
+		if os.Getenv("APP_ENV") == "dev" {
+			dsn = "host=localhost port=5434 user=postgres password=postgres dbname=devdb sslmode=disable"
+		} else {
+			log.Fatal("DATABASE_URL not set")
+		}
+	}
 
 	var db *gorm.DB
 	var err error

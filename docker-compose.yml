@@ -1,25 +1,48 @@
 version: '3.8'
+
+x-db-service: &postgres-service
+  image: postgres:15
+  networks: [ app-net ]
+
+x-db-env: &postgres-env
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+
+x-db-healthcheck: &healthcheck
+  test: [ "CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}" ]
+  interval: 1s
+  timeout: 3s
+  retries: 30
+  start_period: 5s
+
 services:
 
   backend:
-    build:
-      context: .
+    build: .
     image: simple-be
-    ports:
-      - "8080:8080"
-    networks:
-      - app-net
-
-  db:
-    image: postgres:15
+    ports: [ "8080:8080" ]
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - "5434:5432"
-    networks:
-      - app-net
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      db_dev:
+        condition: service_healthy
+    networks: [ app-net ]
+
+  db_dev:
+    <<: *postgres-service
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: devdb
+    ports: [ "5434:5432" ]
+    healthcheck: *healthcheck
+
+  db_test:
+    <<: *postgres-service
+    environment:
+      <<: *postgres-env
+      POSTGRES_DB: testdb
+    ports: [ "5435:5432" ]
+    healthcheck: *healthcheck
 
 networks:
   app-net:

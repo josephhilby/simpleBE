@@ -15,13 +15,11 @@ case $COMMAND in
     build)
         echo "Building Docker images..."
         docker compose build --no-cache
-        echo "Starting DB and web containers..."
-        docker compose up -d db backend
         ;;
 
     start)
-        echo "Starting containers (DB + web)..."
-        docker compose up -d db backend
+        echo "Starting containers (API + Dev DB)..."
+        docker compose up -d db_dev db_test backend
         echo "Containers started!"
         echo "API:     http://localhost:8080/api/hello"
         ;;
@@ -34,6 +32,13 @@ case $COMMAND in
     stop-all)
         echo "Stopping containers and deleting volumes (Postgres data will be lost)..."
         docker compose down -v
+        ;;
+
+    test)
+        echo "Exporting .env variables"
+        export TEST_DATABASE_URL="$(awk -F= '/^TEST_DATABASE_URL=/{print substr($0,index($0,$2))}' .env)"
+        echo "Running tests"
+        go test -tags=postgres ./test -v -race -count=1
         ;;
 
     logs)
@@ -52,10 +57,11 @@ case $COMMAND in
         echo ""
         echo "Usage: $0 {build|start|stop|stop-all|init|logs|cleanup}"
         echo ""
-        echo "  build      Build, start, and run initial setup for database and web services"
-        echo "  start      Start services (for regular use)"
-        echo "  stop       Stop services (for regular use)"
+        echo "  build      Build database and web services"
+        echo "  start      Start services (for dev use)"
+        echo "  stop       Stop services (for dev use)"
         echo "  stop-all   Stop services and delete volumes (db data)"
+        echo "  test       Runs test suite"
         echo "  init       Run initial setup for database (run after stop-all)"
         echo "  logs       Show container logs"
         echo "  cleanup    Remove containers, volumes, and images (complete reset)"

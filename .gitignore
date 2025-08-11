@@ -1,0 +1,58 @@
+# --- Go build artifacts ---
+/server
+/bin/
+/build/
+/dist/
+/out/
+/coverage/
+/coverage.out
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Vendor (only if you decide to vendor deps)
+vendor/
+
+# Logs & temp
+*.log
+*.tmp
+tmp/
+
+# --- Env files (do not commit secrets) ---
+.env
+.env
+!.env.example
+!.env.dev.example
+!.env.test.example
+!.env.prod.example
+
+# --- Docker / local volumes ---
+docker-data/
+postgres-data/
+
+# --- IDE / editor ---
+.idea/
+.vscode/
+*.iml
+
+# --- macOS junk ---
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# --- Protobuf (uncomment if you DON'T commit generated code) ---
+# *.pb.go
+# *_grpc.pb.go
+# gen/
+# api/pb/
+
+# --- Test & profiling artifacts ---
+**/*.prof
+**/*.pprof
+**/cover.*
+profile.cov
